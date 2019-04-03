@@ -1,5 +1,6 @@
 import React from 'react'
 import { render } from 'react-dom'
+import PorpTypes from "prop-types"
 
 let bookList = [
 	{"title": "Hunger", "author": "Roxane Gay", "pages": 320},
@@ -8,7 +9,7 @@ let bookList = [
 	{"title": "Cat's Cradle", "author": "Kurt Vonnegut", "pages": 304}
 ]
 
-const Book = ({title, author, pages, freeBookmark}) => {
+const Book = ({title="No Title Provided", author="No Author", pages=0, freeBookmark}) => {
 	return (
 		<section>
 			<h2>{title}</h2>
@@ -30,25 +31,31 @@ const NotHiring = () =>
 	</div>
 
 class Library extends React.Component {
+
+	static defaultProps = {
+		books: [
+			{"title": "tahoe Tales", "author": "Chet Whitley", "pages":1000}
+		]
+	}
 	
 	state = { 
 		open: true,
 		freeBookmark: false,
-        hiring: true,
-        data: [],
-        loading: false
-        
-    }
-    compontentDidMount() {
-    this.setState({loading: true})
-    fetch("https://hplussport.com/api/products/order/price/sort/asc/qty1")
-     .then(data => data.json())
-     .then(data => this.setState({data, loading: false}))
-    }
+		hiring: true,
+		data: [],
+		loading: false
+	}
 
-    compontentDidUpdate() {
-        console.log("The component just updated")
-    }
+	componentDidMount() {
+		this.setState({loading: true})
+		fetch('https://hplussport.com/api/products/order/price/sort/asc/qty/1')
+			.then(data => data.json())
+			.then(data => this.setState({data, loading: false}))
+	}
+
+	componentDidUpdate() {
+		console.log("The component just updated")
+	}
 
 	toggleOpenClosed = () => {
 		this.setState(prevState => ({
@@ -59,21 +66,22 @@ class Library extends React.Component {
 		const { books } = this.props
 		return (
 			<div>
-                {this.state.hiring ? <Hiring /> : <NotHiring />}
-				this.state.loading
-                ?"loading..."
-                : <div>
-                    {this.state.data.map(product => {
-                        return (
-                            <div>
-                                <h3>Library Product of the week!</h3>
-                                <h4>{product.name}</h4>
-                                </div>
-                                )
-                     })}
-                </div>
-                }
-
+				{this.state.hiring ? <Hiring /> : <NotHiring />}
+				{this.state.loading 
+					? "loading..."
+					: <div>
+						{this.state.data.map(product => {
+							return (
+								<div key={product.id}>
+									<h3>Library Product of the Week!</h3>
+									<h4>{product.name}</h4>
+									<img alt={product.name} src={product.image} height={100}/>
+								</div>
+							)
+						})}
+						
+					</div>
+				}
 				<h1>The library is {this.state.open ? 'open' : 'closed'}</h1>
 				<button onClick={this.toggleOpenClosed}>Change</button>
 				{books.map(
@@ -91,8 +99,8 @@ class Library extends React.Component {
 }
 
 
-
-render(
-	<Library books={bookList}/>, 
-	document.getElementById('root')
+	render(
+	   <Library books={bookList} />, 
+	   document.getElementById('root')
 )
+
